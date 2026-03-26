@@ -1,0 +1,39 @@
+
+Lmod is automatically replacing "gcc/12.2.0" with "gcc-native/14.2".
+
+
+Lmod is automatically replacing "PrgEnv-cray/8.6.0" with "PrgEnv-gnu/8.6.0".
+
+
+Lmod is automatically replacing "cce/19.0.0" with "gcc/12.2.0".
+
+-------------------------------------------------------------------------------
+There are messages associated with the following module(s):
+-------------------------------------------------------------------------------
+
+cray-mpich/8.1.27:
+   This version of the MPI library which came with the currently unsupported
+   23.09 version of the programming environment, is no longer compatible
+   with the network stack on the system. For users of the GNU compilers,
+   there is no solution. Users of other compilers: Unless you use rpath
+   linking or prepend/append CRAY_LD_LIBRARYPATH to LD_LIBRARYPATH, programs
+   will likely run as they will effectively use the MPI libraries from the
+   default version of the programming environment. If you don't understand
+   this text, then you should start using version 25.03 of the programming
+   environment as you will have more issues.
+
+-------------------------------------------------------------------------------
+Due to MODULEPATH changes, the following have been reloaded:
+  1) cray-libsci/25.03.0
+
+The following have been reloaded with a version change:
+  1) cray-mpich/8.1.32 => cray-mpich/8.1.27
+
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) ModuleLabel/label   2) lumi-tools/24.05   3) init-lumi/0.2
+
+The following sticky modules could not be reloaded:
+
+  1) lumi-tools

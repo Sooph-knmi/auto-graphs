@@ -1,0 +1,2 @@
+[console_scripts]
+anemoi-datasets = anemoi.datasets.__main__:main

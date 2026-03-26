@@ -1,0 +1,954 @@
+------------------------------------------------------------
+Task  starting
+Node:        nid007956
+GPU:         
+Start time:  Wed Mar 25 14:42:09 EET 2026
+Graph path:  
+------------------------------------------------------------
+/pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/config/config_pzdz.yaml
+DATA_DIR: /pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+
+
+============================ ROCm System Management Interface ============================
+======================================= Numa Nodes =======================================
+GPU[0]		: (Topology) Numa Node: 3
+GPU[0]		: (Topology) Numa Affinity: 3
+GPU[1]		: (Topology) Numa Node: 3
+GPU[1]		: (Topology) Numa Affinity: 3
+GPU[2]		: (Topology) Numa Node: 1
+GPU[2]		: (Topology) Numa Affinity: 1
+GPU[3]		: (Topology) Numa Node: 1
+GPU[3]		: (Topology) Numa Affinity: 1
+GPU[4]		: (Topology) Numa Node: 0
+GPU[4]		: (Topology) Numa Affinity: 0
+GPU[5]		: (Topology) Numa Node: 0
+GPU[5]		: (Topology) Numa Affinity: 0
+GPU[6]		: (Topology) Numa Node: 2
+GPU[6]		: (Topology) Numa Affinity: 2
+GPU[7]		: (Topology) Numa Node: 2
+GPU[7]		: (Topology) Numa Affinity: 2
+================================== End of ROCm SMI Log ===================================
+Rank 0 --> pid 65393's current affinity mask: fefefefefefefefefefefefefefefefe; GPU 0,1,2,3,4,5,6,7
+Received config:
+hardware:
+  paths:
+    data: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets
+    output: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/output
+    logs:
+      base: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/logs/
+      mlflow: ${hardware.paths.logs.base}mlflow/
+    graph: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11
+    warm_start: null
+dataloader:
+  training:
+    dataset: ${dataloader.dataset}
+    start: null
+    end: 2020
+    frequency: 6h
+    drop: []
+  validation:
+    dataset: ${dataloader.dataset}
+    start: 2021
+    end: 2021
+    frequency: 6h
+    drop: []
+  hectometric: true
+  hectometric_dataset_training: /pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+  hectometric_dataset_validation: /pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+  dataset:
+    cutout:
+    - dataset: null
+    - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr
+      drop:
+      - al
+      - cp
+      - latitude
+      - longitude
+      - q_250
+      - q_50
+      - q_600
+      - sdor
+      - slor
+      - sr
+      - stl1
+      - swvl1
+      - t_250
+      - t_50
+      - t_600
+      - tcw
+      - u_250
+      - u_50
+      - u_600
+      - v_250
+      - v_50
+      - v_600
+      - w_250
+      - w_50
+      - w_600
+      - z_250
+      - z_50
+      - z_600
+      reorder: sort
+    min_distance_km: 20
+    adjust: all
+    reorder: sort
+    statistics:
+      join:
+      - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr
+        drop:
+        - cp
+        - slor
+        - sdor
+        - tcw
+        - q_50
+        - q_250
+        - q_600
+        - t_50
+        - t_250
+        - t_600
+        - u_50
+        - u_250
+        - u_600
+        - v_50
+        - v_250
+        - v_600
+        - w_50
+        - w_250
+        - w_600
+        - z_50
+        - z_250
+        - z_600
+        reorder: sort
+      - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr
+        select:
+        - lcc
+        - mcc
+        - hcc
+        - tcc
+        - strd
+        - ssrd
+      adjust:
+      - start
+      - end
+      reorder: sort
+graph:
+  overwrite: true
+  data: data
+  hidden: hidden
+  nodes:
+    hidden:
+      node_builder:
+        _target_: anemoi.graphs.nodes.StretchedTriNodes
+        lam_resolution: 12
+        global_resolution: 7
+        reference_node_name: ${graph.data}
+        mask_attr_name: cutout_mask
+        margin_radius_km: 11
+  edges:
+  - source_name: ${graph.data}
+    target_name: ${graph.hidden}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.KNNEdges
+      num_nearest_neighbours: 12
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  - source_name: ${graph.hidden}
+    target_name: ${graph.hidden}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.MultiScaleEdges
+      x_hops: 1
+      scale_resolutions:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 12
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  - source_name: ${graph.hidden}
+    target_name: ${graph.data}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.KNNEdges
+      num_nearest_neighbours: 3
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  attributes:
+    nodes:
+      cutout_mask:
+        _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      boundary_mask:
+        _target_: anemoi.graphs.nodes.attributes.BooleanNot
+        masks:
+Received config:
+hardware:
+  paths:
+    data: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets
+    output: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/output
+    logs:
+      base: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/logs/
+      mlflow: ${hardware.paths.logs.base}mlflow/
+    graph: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11
+    warm_start: null
+dataloader:
+  training:
+    dataset: ${dataloader.dataset}
+    start: null
+    end: 2020
+    frequency: 6h
+    drop: []
+  validation:
+    dataset: ${dataloader.dataset}
+    start: 2021
+    end: 2021
+    frequency: 6h
+    drop: []
+  hectometric: true
+  hectometric_dataset_training: /pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+  hectometric_dataset_validation: /pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+  dataset:
+    cutout:
+    - dataset: null
+    - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr
+      drop:
+      - al
+      - cp
+      - latitude
+      - longitude
+      - q_250
+      - q_50
+      - q_600
+      - sdor
+      - slor
+      - sr
+      - stl1
+      - swvl1
+      - t_250
+      - t_50
+      - t_600
+      - tcw
+      - u_250
+      - u_50
+      - u_600
+      - v_250
+      - v_50
+      - v_600
+      - w_250
+      - w_50
+      - w_600
+      - z_250
+      - z_50
+      - z_600
+      reorder: sort
+    min_distance_km: 20
+    adjust: all
+    reorder: sort
+    statistics:
+      join:
+      - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr
+        drop:
+        - cp
+        - slor
+        - sdor
+        - tcw
+        - q_50
+        - q_250
+        - q_600
+        - t_50
+        - t_250
+        - t_600
+        - u_50
+        - u_250
+        - u_600
+        - v_50
+        - v_250
+        - v_600
+        - w_50
+        - w_250
+        - w_600
+        - z_50
+        - z_250
+        - z_600
+        reorder: sort
+      - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr
+        select:
+        - lcc
+        - mcc
+        - hcc
+        - tcc
+        - strd
+        - ssrd
+      adjust:
+      - start
+      - end
+      reorder: sort
+graph:
+  overwrite: true
+  data: data
+  hidden: hidden
+  nodes:
+    hidden:
+      node_builder:
+        _target_: anemoi.graphs.nodes.StretchedTriNodes
+        lam_resolution: 12
+        global_resolution: 7
+        reference_node_name: ${graph.data}
+        mask_attr_name: cutout_mask
+        margin_radius_km: 11
+  edges:
+  - source_name: ${graph.data}
+    target_name: ${graph.hidden}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.KNNEdges
+      num_nearest_neighbours: 12
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  - source_name: ${graph.hidden}
+    target_name: ${graph.hidden}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.MultiScaleEdges
+      x_hops: 1
+      scale_resolutions:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 12
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  - source_name: ${graph.hidden}
+    target_name: ${graph.data}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.KNNEdges
+      num_nearest_neighbours: 3
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  attributes:
+    nodes:
+      cutout_mask:
+        _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      boundary_mask:
+        _target_: anemoi.graphs.nodes.attributes.BooleanNot
+        masks:
+          _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      area_weight:
+        _target_: anemoi.graphs.nodes.attributes.SphericalAreaWeights
+        norm: unit-max
+        fill_value: 0
+      lam_area_weight:
+        _target_: anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights
+        mask_node_attr_name: cutout_mask
+        norm: unit-max
+    edges:
+      edge_length:
+        _target_: anemoi.graphs.edges.attributes.EdgeLength
+        norm: unit-max
+      edge_dirs:
+        _target_: anemoi.graphs.edges.attributes.EdgeDirection
+        norm: unit-std
+  post_processors: []
+
+{'training': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': None, 'end': 2020, 'frequency': '6h', 'drop': []}, 'validation': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': 2021, 'end': 2021, 'frequency': '6h', 'drop': []}, 'hectometric': True, 'hectometric_dataset_training': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'hectometric_dataset_validation': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_60          _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      area_weight:
+        _target_: anemoi.graphs.nodes.attributes.SphericalAreaWeights
+        norm: unit-max
+        fill_value: 0
+      lam_area_weight:
+        _target_: anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights
+        mask_node_attr_name: cutout_mask
+        norm: unit-max
+    edges:
+      edge_length:
+        _target_: anemoi.graphs.edges.attributes.EdgeLength
+        norm: unit-max
+      edge_dirs:
+        _target_: anemoi.graphs.edges.attributes.EdgeDirection
+        norm: unit-std
+  post_processors: []
+
+{'training': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': None, 'end': 2020, 'frequency': '6h', 'drop': []}, 'validation': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': 2021, 'end': 2021, 'frequency': '6h', 'drop': []}, 'hectometric': True, 'hectometric_dataset_training': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'hectometric_dataset_validation': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_60Received config:
+hardware:
+  paths:
+    data: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets
+    output: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/output
+    logs:
+      base: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/logs/
+      mlflow: ${hardware.paths.logs.base}mlflow/
+    graph: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11
+    warm_start: null
+dataloader:
+  training:
+    dataset: ${dataloader.dataset}
+    start: null
+    end: 2020
+    frequency: 6h
+    drop: []
+  validation:
+    dataset: ${dataloader.dataset}
+    start: 2021
+    end: 2021
+    frequency: 6h
+    drop: []
+  hectometric: true
+  hectometric_dataset_training: /pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+  hectometric_dataset_validation: /pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+  dataset:
+    cutout:
+    - dataset: null
+    - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr
+      drop:
+      - al
+      - cp
+      - latitude
+      - longitude
+      - q_250
+      - q_50
+      - q_600
+      - sdor
+      - slor
+      - sr
+      - stl1
+      - swvl1
+      - t_250
+      - t_50
+      - t_600
+      - tcw
+      - u_250
+      - u_50
+      - u_600
+      - v_250
+      - v_50
+      - v_600
+      - w_250
+      - w_50
+      - w_600
+      - z_250
+      - z_50
+      - z_600
+      reorder: sort
+    min_distance_km: 20
+    adjust: all
+    reorder: sort
+    statistics:
+      join:
+      - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr
+        drop:
+        - cp
+        - slor
+        - sdor
+        - tcw
+        - q_50
+        - q_250
+        - q_600
+        - t_50
+        - t_250
+        - t_600
+        - u_50
+        - u_250
+        - u_600
+        - v_50
+        - v_250
+        - v_600
+        - w_50
+        - w_250
+        - w_600
+        - z_50
+        - z_250
+        - z_600
+        reorder: sort
+      - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr
+        select:
+        - lcc
+        - mcc
+        - hcc
+        - tcc
+        - strd
+        - ssrd
+      adjust:
+      - start
+      - end
+      reorder: sort
+graph:
+  overwrite: true
+  data: data
+  hidden: hidden
+  nodes:
+    hidden:
+      node_builder:
+        _target_: anemoi.graphs.nodes.StretchedTriNodes
+        lam_resolution: 12
+        global_resolution: 7
+        reference_node_name: ${graph.data}
+        mask_attr_name: cutout_mask
+        margin_radius_km: 11
+  edges:
+  - source_name: ${graph.data}
+    target_name: ${graph.hidden}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.KNNEdges
+      num_nearest_neighbours: 12
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  - source_name: ${graph.hidden}
+    target_name: ${graph.hidden}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.MultiScaleEdges
+      x_hops: 1
+      scale_resolutions:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 12
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  - source_name: ${graph.hidden}
+    target_name: ${graph.data}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.KNNEdges
+      num_nearest_neighbours: 3
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  attributes:
+    nodes:
+      cutout_mask:
+        _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      boundary_mask:
+        _target_: anemoi.graphs.nodes.attributes.BooleanNot
+        masks:
+          _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      area_weight:
+        _target_: anemoi.graphs.nodes.attributes.SphericalAreaWeights
+        norm: unit-max
+        fill_value: 0
+      lam_area_weight:
+        _target_: anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights
+        mask_node_attr_name: cutout_mask
+        norm: unit-max
+    edges:
+      edge_length:
+        _target_: anemoi.graphs.edges.attributes.EdgeLength
+        norm: unit-max
+      edge_dirs:
+        _target_: anemoi.graphs.edges.attributes.EdgeDirection
+        norm: unit-std
+  post_processors: []
+
+{'training': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': None, 'end': 2020, 'frequency': '6h', 'drop': []}, 'validation': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': 2021, 'end': 2021, 'frequency': '6h', 'drop': []}, 'hectometric': True, 'hectometric_dataset_training': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'hectometric_dataset_validation': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_60Received config:
+hardware:
+  paths:
+    data: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets
+    output: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/output
+    logs:
+      base: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/logs/
+      mlflow: ${hardware.paths.logs.base}mlflow/
+    graph: /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11
+    warm_start: null
+dataloader:
+  training:
+    dataset: ${dataloader.dataset}
+    start: null
+    end: 2020
+    frequency: 6h
+    drop: []
+  validation:
+    dataset: ${dataloader.dataset}
+    start: 2021
+    end: 2021
+    frequency: 6h
+    drop: []
+  hectometric: true
+  hectometric_dataset_training: /pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+  hectometric_dataset_validation: /pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+  dataset:
+    cutout:
+    - dataset: null
+    - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr
+      drop:
+      - al
+      - cp
+      - latitude
+      - longitude
+      - q_250
+      - q_50
+      - q_600
+      - sdor
+      - slor
+      - sr
+      - stl1
+      - swvl1
+      - t_250
+      - t_50
+      - t_600
+      - tcw
+      - u_250
+      - u_50
+      - u_600
+      - v_250
+      - v_50
+      - v_600
+      - w_250
+      - w_50
+      - w_600
+      - z_250
+      - z_50
+      - z_600
+      reorder: sort
+    min_distance_km: 20
+    adjust: all
+    reorder: sort
+    statistics:
+      join:
+      - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr
+        drop:
+        - cp
+        - slor
+        - sdor
+        - tcw
+        - q_50
+        - q_250
+        - q_600
+        - t_50
+        - t_250
+        - t_600
+        - u_50
+        - u_250
+        - u_600
+        - v_50
+        - v_250
+        - v_600
+        - w_50
+        - w_250
+        - w_600
+        - z_50
+        - z_250
+        - z_600
+        reorder: sort
+      - dataset: /pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr
+        select:
+        - lcc
+        - mcc
+        - hcc
+        - tcc
+        - strd
+        - ssrd
+      adjust:
+      - start
+      - end
+      reorder: sort
+graph:
+  overwrite: true
+  data: data
+  hidden: hidden
+  nodes:
+    hidden:
+      node_builder:
+        _target_: anemoi.graphs.nodes.StretchedTriNodes
+        lam_resolution: 12
+        global_resolution: 7
+        reference_node_name: ${graph.data}
+        mask_attr_name: cutout_mask
+        margin_radius_km: 11
+  edges:
+  - source_name: ${graph.data}
+    target_name: ${graph.hidden}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.KNNEdges
+      num_nearest_neighbours: 12
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  - source_name: ${graph.hidden}
+    target_name: ${graph.hidden}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.MultiScaleEdges
+      x_hops: 1
+      scale_resolutions:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 12
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  - source_name: ${graph.hidden}
+    target_name: ${graph.data}
+    edge_builders:
+    - _target_: anemoi.graphs.edges.KNNEdges
+      num_nearest_neighbours: 3
+      source_mask_attr_name: null
+      target_mask_attr_name: null
+    attributes: ${graph.attributes.edges}
+  attributes:
+    nodes:
+      cutout_mask:
+        _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      boundary_mask:
+        _target_: anemoi.graphs.nodes.attributes.BooleanNot
+        masks:
+          _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      area_weight:
+        _target_: anemoi.graphs.nodes.attributes.SphericalAreaWeights
+        norm: unit-max
+        fill_value: 0
+      lam_area_weight:
+        _target_: anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights
+        mask_node_attr_name: cutout_mask
+        norm: unit-max
+    edges:
+      edge_length:
+        _target_: anemoi.graphs.edges.attributes.EdgeLength
+        norm: unit-max
+      edge_dirs:
+        _target_: anemoi.graphs.edges.attributes.EdgeDirection
+        norm: unit-std
+  post_processors: []
+
+{'training': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': None, 'end': 2020, 'frequency': '6h', 'drop': []}, 'validation': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': 2021, 'end': 2021, 'frequency': '6h', 'drop': []}, 'hectometric': True, 'hectometric_dataset_training': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'hectometric_dataset_validation': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}}
+{'training': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': None, 'end': 2020, 'frequency': '6h', 'drop': []}, 'validation': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': 2021, 'end': 2021, 'frequency': '6h', 'drop': []}, 'hectometric': True, 'hectometric_dataset_training': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'hectometric_dataset_validation': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}}
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+PROCESS IN PROGRESS
+PROCESS SINGLE FILE HECTO
+PROCESS SINGLE FILE HECTO
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+['de330', '2025061700', '2025061900', '1h', 'ALARO', '500m', 'flooding3', 'v2.zarr']
+2025061700 2025061900
+PROCESS SINGLE FILE HECTO
+PROCESS SINGLE FILE HECTO
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+['de330', '2025061700', '2025061900', '1h', 'ALARO', '500m', 'flooding3', 'v2.zarr']
+2025061700 2025061900
+Updating config for phase: training
+Structs: {'de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2': {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}}
+Updating config for phase: validation
+Structs: {'de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2': {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}}
+[2026-03-25 14:42:59,352][graph_setup][INFO] - dynamic_mode: True, proceeding with multiple graphs
+0', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}}
+{'training': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': None, 'end': 2020, 'frequency': '6h', 'drop': []}, 'validation': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': 2021, 'end': 2021, 'frequency': '6h', 'drop': []}, 'hectometric': True, 'hectometric_dataset_training': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'hectometric_dataset_validation': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}}
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+PROCESS IN PROGRESS
+PROCESS SINGLE FILE HECTO
+PROCESS SINGLE FILE HECTO
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+['de330', '2025061700', '2025061900', '1h', 'ALARO', '500m', 'flooding3', 'v2.zarr']
+2025061700 2025061900
+PROCESS SINGLE FILE HECTO
+PROCESS SINGLE FILE HECTO
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+['de330', '2025061700', '2025061900', '1h', 'ALARO', '500m', 'flooding3', 'v2.zarr']
+2025061700 2025061900
+Updating config for phase: training
+Structs: {'de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2': {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}}
+Updating config for phase: validation
+Structs: {'de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2': {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}}
+[2026-03-25 14:42:59,352][graph_setup][INFO] - dynamic_mode: True, proceeding with multiple graphs
+0', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}}
+{'training': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': None, 'end': 2020, 'frequency': '6h', 'drop': []}, 'validation': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': 2021, 'end': 2021, 'frequency': '6h', 'drop': []}, 'hectometric': True, 'hectometric_dataset_training': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'hectometric_dataset_validation': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}}
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+PROCESS IN PROGRESS
+PROCESS SINGLE FILE HECTO
+PROCESS SINGLE FILE HECTO
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+['de330', '2025061700', '2025061900', '1h', 'ALARO', '500m', 'flooding3', 'v2.zarr']
+2025061700 2025061900
+PROCESS SINGLE FILE HECTO
+PROCESS SINGLE FILE HECTO
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+['de330', '2025061700', '2025061900', '1h', 'ALARO', '500m', 'flooding3', 'v2.zarr']
+2025061700 2025061900
+Updating config for phase: training
+Structs: {'de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2': {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}}
+Updating config for phase: validation
+Structs: {'de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2': {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}}
+[2026-03-25 14:42:59,352][graph_setup][INFO] - dynamic_mode: True, proceeding with multiple graphs
+0', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}}
+{'training': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': None, 'end': 2020, 'frequency': '6h', 'drop': []}, 'validation': {'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': 2021, 'end': 2021, 'frequency': '6h', 'drop': []}, 'hectometric': True, 'hectometric_dataset_training': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'hectometric_dataset_validation': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr', 'dataset': {'cutout': [{'dataset': None}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}}
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+PROCESS IN PROGRESS
+PROCESS SINGLE FILE HECTO
+PROCESS SINGLE FILE HECTO
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+['de330', '2025061700', '2025061900', '1h', 'ALARO', '500m', 'flooding3', 'v2.zarr']
+2025061700 2025061900
+PROCESS SINGLE FILE HECTO
+PROCESS SINGLE FILE HECTO
+/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr
+['de330', '2025061700', '2025061900', '1h', 'ALARO', '500m', 'flooding3', 'v2.zarr']
+2025061700 2025061900
+Updating config for phase: training
+Structs: {'de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2': {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}}
+Updating config for phase: validation
+Structs: {'de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2': {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}}
+[2026-03-25 14:42:59,352][graph_setup][INFO] - dynamic_mode: True, proceeding with multiple graphs
+[2026-03-25 14:42:59,383][anemoi.graphs.nodes.builders.from_file][INFO] - Reading the dataset from {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}.
+[2026-03-25 14:42:59,383][anemoi.graphs.nodes.builders.from_file][INFO] - Reading the dataset from {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}.
+[2026-03-25 14:42:59,383][anemoi.graphs.nodes.builders.from_file][INFO] - Reading the dataset from {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}.
+[2026-03-25 14:42:59,383][anemoi.graphs.nodes.builders.from_file][INFO] - Reading the dataset from {'dataset': {'cutout': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.zarr'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-od-an-oper-0001-mars-n320-2024-2025-6h-v1.zarr', 'drop': ['al', 'cp', 'latitude', 'longitude', 'q_250', 'q_50', 'q_600', 'sdor', 'slor', 'sr', 'stl1', 'swvl1', 't_250', 't_50', 't_600', 'tcw', 'u_250', 'u_50', 'u_600', 'v_250', 'v_50', 'v_600', 'w_250', 'w_50', 'w_600', 'z_250', 'z_50', 'z_600'], 'reorder': 'sort'}], 'min_distance_km': 20, 'adjust': 'all', 'reorder': 'sort', 'statistics': {'join': [{'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr', 'drop': ['cp', 'slor', 'sdor', 'tcw', 'q_50', 'q_250', 'q_600', 't_50', 't_250', 't_600', 'u_50', 'u_250', 'u_600', 'v_50', 'v_250', 'v_600', 'w_50', 'w_250', 'w_600', 'z_50', 'z_250', 'z_600'], 'reorder': 'sort'}, {'dataset': '/pfs/lustrep4/scratch/project_465000527/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr', 'select': ['lcc', 'mcc', 'hcc', 'tcc', 'strd', 'ssrd']}], 'adjust': ['start', 'end'], 'reorder': 'sort'}}, 'start': '2025-06-17', 'end': '2025-06-19', 'frequency': '6h', 'drop': []}.
+Initialized AnemoiDatasetNodes with device: cuda:1
+Registering nodes for AnemoiDatasetNodes on device: cuda:1
+Initialized StretchedTriNodes with device: cuda:1
+[2026-03-25 14:49:45,655][anemoi.graphs.generate.masks][INFO] - Fitting KNNAreaMaskBuilder with 2217121 reference nodes from "data (cutout_mask)".
+Initialized AnemoiDatasetNodes with device: cuda:2
+Registering nodes for AnemoiDatasetNodes on device: cuda:2
+Initialized StretchedTriNodes with device: cuda:2
+[2026-03-25 14:49:47,663][anemoi.graphs.generate.masks][INFO] - Fitting KNNAreaMaskBuilder with 2217121 reference nodes from "data (cutout_mask)".
+Initialized AnemoiDatasetNodes with device: cuda:3
+Registering nodes for AnemoiDatasetNodes on device: cuda:3
+Initialized StretchedTriNodes with device: cuda:3
+[2026-03-25 14:50:02,158][anemoi.graphs.generate.masks][INFO] - Fitting KNNAreaMaskBuilder with 2217121 reference nodes from "data (cutout_mask)".
+Initialized AnemoiDatasetNodes with device: cuda:0
+Registering nodes for AnemoiDatasetNodes on device: cuda:0
+Initialized StretchedTriNodes with device: cuda:0
+[2026-03-25 14:50:07,483][anemoi.graphs.generate.masks][INFO] - Fitting KNNAreaMaskBuilder with 2217121 reference nodes from "data (cutout_mask)".
+Registering nodes for StretchedTriNodes on device: cuda:2
+[2026-03-25 15:21:22,121][anemoi.graphs.edges.builders.knn][INFO] - Using KNN-Edges (with 12 nearest neighbours) between data and hidden.
+[2026-03-25 15:21:22,132][anemoi.graphs.edges.builders.base][WARNING] - The 'torch-cluster' library is not installed.
+Installing 'torch-cluster' can significantly improve performance for graph creation.
+You can install it using:
+    TORCH_VERSION=$(python -c "import torch; print(torch.__version__)")
+    pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}.html
+
+Registering nodes for StretchedTriNodes on device: cuda:1
+[2026-03-25 15:21:31,602][anemoi.graphs.edges.builders.knn][INFO] - Using KNN-Edges (with 12 nearest neighbours) between data and hidden.
+[2026-03-25 15:21:31,613][anemoi.graphs.edges.builders.base][WARNING] - The 'torch-cluster' library is not installed.
+Installing 'torch-cluster' can significantly improve performance for graph creation.
+You can install it using:
+    TORCH_VERSION=$(python -c "import torch; print(torch.__version__)")
+    pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}.html
+
+Registering nodes for StretchedTriNodes on device: cuda:3
+[2026-03-25 15:21:48,652][anemoi.graphs.edges.builders.knn][INFO] - Using KNN-Edges (with 12 nearest neighbours) between data and hidden.
+[2026-03-25 15:21:48,664][anemoi.graphs.edges.builders.base][WARNING] - The 'torch-cluster' library is not installed.
+Installing 'torch-cluster' can significantly improve performance for graph creation.
+You can install it using:
+    TORCH_VERSION=$(python -c "import torch; print(torch.__version__)")
+    pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}.html
+
+Registering nodes for StretchedTriNodes on device: cuda:0
+[2026-03-25 15:23:05,145][anemoi.graphs.edges.builders.knn][INFO] - Using KNN-Edges (with 12 nearest neighbours) between data and hidden.
+[2026-03-25 15:23:05,156][anemoi.graphs.edges.builders.base][WARNING] - The 'torch-cluster' library is not installed.
+Installing 'torch-cluster' can significantly improve performance for graph creation.
+You can install it using:
+    TORCH_VERSION=$(python -c "import torch; print(torch.__version__)")
+    pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}.html
+
+[2026-03-25 15:27:03,607][anemoi.graphs.edges.builders.knn][INFO] - Using KNN-Edges (with 3 nearest neighbours) between hidden and data.
+[2026-03-25 15:27:03,608][anemoi.graphs.edges.builders.base][WARNING] - The 'torch-cluster' library is not installed.
+Installing 'torch-cluster' can significantly improve performance for graph creation.
+You can install it using:
+    TORCH_VERSION=$(python -c "import torch; print(torch.__version__)")
+    pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}.html
+
+[2026-03-25 15:27:08,814][anemoi.graphs.create][INFO] - Cleaning graph.
+[2026-03-25 15:27:08,814][anemoi.graphs.create][INFO] - _grid_reference_distance deleted from graph.
+[2026-03-25 15:27:08,815][anemoi.graphs.create][INFO] - _dataset deleted from graph.
+[2026-03-25 15:27:08,815][anemoi.graphs.create][INFO] - _grid_reference_distance deleted from graph.
+[2026-03-25 15:27:08,815][anemoi.graphs.create][INFO] - _resolutions deleted from graph.
+[2026-03-25 15:27:08,815][anemoi.graphs.create][INFO] - _node_ordering deleted from graph.
+[2026-03-25 15:27:08,815][anemoi.graphs.create][INFO] - _area_mask_builder deleted from graph.
+[2026-03-25 15:27:08,815][anemoi.graphs.create][INFO] - _nx_graph deleted from graph.
+Saving graph to /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.pt...
+[2026-03-25 15:27:09,284][anemoi.graphs.create][INFO] - Graph saved at /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.pt.
+[2026-03-25 15:27:12,636][anemoi.graphs.edges.builders.knn][INFO] - Using KNN-Edges (with 3 nearest neighbours) between hidden and data.
+[2026-03-25 15:27:12,637][anemoi.graphs.edges.builders.base][WARNING] - The 'torch-cluster' library is not installed.
+Installing 'torch-cluster' can significantly improve performance for graph creation.
+You can install it using:
+    TORCH_VERSION=$(python -c "import torch; print(torch.__version__)")
+    pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}.html
+
+[2026-03-25 15:27:18,081][anemoi.graphs.create][INFO] - Cleaning graph.
+[2026-03-25 15:27:18,081][anemoi.graphs.create][INFO] - _grid_reference_distance deleted from graph.
+[2026-03-25 15:27:18,081][anemoi.graphs.create][INFO] - _dataset deleted from graph.
+[2026-03-25 15:27:18,082][anemoi.graphs.create][INFO] - _grid_reference_distance deleted from graph.
+[2026-03-25 15:27:18,082][anemoi.graphs.create][INFO] - _node_ordering deleted from graph.
+[2026-03-25 15:27:18,082][anemoi.graphs.create][INFO] - _resolutions deleted from graph.
+[2026-03-25 15:27:18,082][anemoi.graphs.create][INFO] - _area_mask_builder deleted from graph.
+[2026-03-25 15:27:18,082][anemoi.graphs.create][INFO] - _nx_graph deleted from graph.
+Saving graph to /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.pt...
+[2026-03-25 15:27:18,638][anemoi.graphs.create][INFO] - Graph saved at /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.pt.
+[2026-03-25 15:27:30,694][anemoi.graphs.edges.builders.knn][INFO] - Using KNN-Edges (with 3 nearest neighbours) between hidden and data.
+[2026-03-25 15:27:30,695][anemoi.graphs.edges.builders.base][WARNING] - The 'torch-cluster' library is not installed.
+Installing 'torch-cluster' can significantly improve performance for graph creation.
+You can install it using:
+    TORCH_VERSION=$(python -c "import torch; print(torch.__version__)")
+    pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}.html
+
+[2026-03-25 15:27:36,245][anemoi.graphs.create][INFO] - Cleaning graph.
+[2026-03-25 15:27:36,245][anemoi.graphs.create][INFO] - _grid_reference_distance deleted from graph.
+[2026-03-25 15:27:36,245][anemoi.graphs.create][INFO] - _dataset deleted from graph.
+[2026-03-25 15:27:36,245][anemoi.graphs.create][INFO] - _grid_reference_distance deleted from graph.
+[2026-03-25 15:27:36,245][anemoi.graphs.create][INFO] - _resolutions deleted from graph.
+[2026-03-25 15:27:36,245][anemoi.graphs.create][INFO] - _area_mask_builder deleted from graph.
+[2026-03-25 15:27:36,245][anemoi.graphs.create][INFO] - _node_ordering deleted from graph.
+[2026-03-25 15:27:36,245][anemoi.graphs.create][INFO] - _nx_graph deleted from graph.
+Saving graph to /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.pt...
+[2026-03-25 15:27:36,842][anemoi.graphs.create][INFO] - Graph saved at /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.pt.
+[2026-03-25 15:28:49,044][anemoi.graphs.edges.builders.knn][INFO] - Using KNN-Edges (with 3 nearest neighbours) between hidden and data.
+[2026-03-25 15:28:49,046][anemoi.graphs.edges.builders.base][WARNING] - The 'torch-cluster' library is not installed.
+Installing 'torch-cluster' can significantly improve performance for graph creation.
+You can install it using:
+    TORCH_VERSION=$(python -c "import torch; print(torch.__version__)")
+    pip install torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}.html
+
+[2026-03-25 15:28:55,109][anemoi.graphs.create][INFO] - Cleaning graph.
+[2026-03-25 15:28:55,109][anemoi.graphs.create][INFO] - _grid_reference_distance deleted from graph.
+[2026-03-25 15:28:55,109][anemoi.graphs.create][INFO] - _dataset deleted from graph.
+[2026-03-25 15:28:55,109][anemoi.graphs.create][INFO] - _grid_reference_distance deleted from graph.
+[2026-03-25 15:28:55,109][anemoi.graphs.create][INFO] - _node_ordering deleted from graph.
+[2026-03-25 15:28:55,109][anemoi.graphs.create][INFO] - _area_mask_builder deleted from graph.
+[2026-03-25 15:28:55,109][anemoi.graphs.create][INFO] - _nx_graph deleted from graph.
+[2026-03-25 15:28:55,110][anemoi.graphs.create][INFO] - _resolutions deleted from graph.
+Saving graph to /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.pt...
+[2026-03-25 15:28:55,642][anemoi.graphs.create][INFO] - Graph saved at /pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11/de330_2025061700_2025061900_1h_ALARO_500m_flooding3_v2.pt.
+------------------------------------------------------------
+Task  finished
+End time: Wed Mar 25 15:29:00 EET 2026
+------------------------------------------------------------

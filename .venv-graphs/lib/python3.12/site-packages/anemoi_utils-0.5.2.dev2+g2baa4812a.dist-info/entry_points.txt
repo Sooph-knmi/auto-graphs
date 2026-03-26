@@ -1,0 +1,2 @@
+[console_scripts]
+anemoi-utils = anemoi.utils.__main__:main

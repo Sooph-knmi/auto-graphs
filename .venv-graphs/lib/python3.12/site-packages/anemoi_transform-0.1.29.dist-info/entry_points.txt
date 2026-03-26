@@ -1,0 +1,2 @@
+[console_scripts]
+anemoi-transform = anemoi.transform.__main__:main
