@@ -21,6 +21,17 @@
 #SBATCH --exclusive
 #SBATCH --switches=1
 
+
+########################################
+#        SET PATHS
+########################################
+DATASETS_TXT=/pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/txt_hectometric/hectometric_validation.txt #INSERT .txt files with all dataset paths
+DATASET_BASE_FOLDER=/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr # Base folder for all datasets, will be injected into config
+TMP_CONFIG_DIR=/pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/config # Base folder for temporary configs, will be injected into config
+BASE_CONFIG=/pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/config/hectometric_finetuning.yaml # Base config to copy from, should have placeholders null for dataset paths
+OUTPUT_PATH=/pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11 # Base output path for output graphs, will be injected into config
+- 
+
 ########################################
 #        ENVIRONMENT SETUP
 ########################################
@@ -40,15 +51,6 @@ source $VENV/bin/activate
 export VIRTUAL_ENV=$VENV
 export PYTHONUSERBASE=$VIRTUAL_ENV
 export PATH=$PATH:$VIRTUAL_ENV/bin
-
-########################################
-#        SET PATHS
-########################################
-DATASETS_TXT=/pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/txt_hectometric/hectometric_validation.txt #INSERT .txt files with all dataset paths
-DATASET_BASE_FOLDER=/pfs/lustrep4/scratch/project_465000527/dschonac/DE330_ARCHIVE/zarr # Base folder for all datasets, will be injected into config
-TMP_CONFIG_DIR=/pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/config # Base folder for temporary configs, will be injected into config
-BASE_CONFIG=/pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/multi-domain-hectometric/auto-graphs/config/hectometric_finetuning.yaml # Base config to copy from, should have placeholders null for dataset paths
-OUTPUT_PATH=/pfs/lustrep4/scratch/project_465000527/buurmans/DE_330_WP14/Anemoi/graphs/hectometric_7_12_minus11 # Base output path for output graphs, will be injected into config
 
 IDX=${SLURM_ARRAY_TASK_ID}
 # Take the (IDX+1)-th line from paths.txt — this is JUST the path, not a tuple
