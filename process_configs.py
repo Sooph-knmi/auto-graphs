@@ -117,28 +117,31 @@ class ProcessConfigs:
             ls = f.readlines()
             for lines in ls:
                 filename = lines.strip('\n')
+                print("filename: ", filename)
                 key = filename.split(".")[0]
+                print("key: ", key)
 
                 splitted = lines.split("_")
+                print("splitted: ", splitted)
 
                 start, end = splitted[1:3]
                 start = f"{start[:4]}-{start[4:6]}-{start[6:8]}"
                 end = f"{end[:4]}-{end[4:6]}-{end[6:8]}"
-                print(filename)
+                print("filename: ", filename)
                 directory = base_path + filename
-                # if filename.endswith("v2.zarr"):
-                #     print("dataset v2")
-                #     import os
-                #     directory = directory 
-                #     print(directory)
-                #     tot_filename = os.listdir(directory)[0]
-                #     print(tot_filename)
-                #     self.TEMPORARY[phase][key] = self._findcutoutnulls(
-                #         deepcopy(self.struct[phase]),
-                #         replacement={"dataset": directory + '/' + tot_filename},
-                #     )
-                # else:
-                    # print("dataset v3")
+                if filename.endswith("v2.zarr"):
+                    print("dataset v2")
+                    import os
+                    directory = directory 
+                    print(directory)
+                    tot_filename = os.listdir(directory)[0]
+                    print(tot_filename)
+                    self.TEMPORARY[phase][key] = self._findcutoutnulls(
+                        deepcopy(self.struct[phase]),
+                        replacement={"dataset": directory + '/' + tot_filename},
+                    )
+                else:
+                    print("dataset v3")
                 self.TEMPORARY[phase][key] = self._findcutoutnulls(
                     deepcopy(self.struct[phase]),
                     replacement={"dataset": directory},
@@ -152,17 +155,23 @@ class ProcessConfigs:
     def process_single_file_hecto(self, name, phase):
         print("PROCESS SINGLE FILE HECTO")
         filename = name
-        print(filename)
-        name = name.split("/")[-1]
-        print(name)
+        print("filename: ", filename)
+        if filename.endswith("v2.zarr"):
+            name = name.split("/")[-2]
+        else:
+            name = name.split("/")[-1]
+        print("name: ", name)
         key = name.split(".")[0]
 
         splitted = name.split("_")
-        print(splitted)
+        print("splitted: ", splitted)
         start, end = splitted[1:3]
-        print(start, end)
+        print("start: ", start)
+        print("end: ", end)
         start = f"{start[:4]}-{start[4:6]}-{start[6:8]}"
         end = f"{end[:4]}-{end[4:6]}-{end[6:8]}"
+        print("start: ", start)
+        print("end: ", end)
         self.TEMPORARY[phase][key] = self._findcutoutnulls(
             deepcopy(self.struct[phase]),
             replacement={"dataset": filename},

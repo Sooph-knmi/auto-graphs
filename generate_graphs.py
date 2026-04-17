@@ -8,7 +8,7 @@ import logging
 
 
 # CHANGE CONFIG PATH TO THE BASE CONFIG PATH OF THE hectometric_finetuning.yaml CONFIG
-@hydra.main(version_base=None, config_path="/leonardo_work/DestE_330_25/users/sbuurman/multi-domain-training/anemoi-core/training/src/anemoi/training/config/", config_name="hectometric_finetuning.yaml")
+@hydra.main(version_base=None, config_path=None, config_name=None)
 def main(config: DictConfig) -> None:
     print("Received config:")
     print(OmegaConf.to_yaml(config))

@@ -1,0 +1,64 @@
+defaults:
+- _self_
+# - data: zarr
+- dataloader: multi_domain
+# - datamodule: ens
+# - diagnostics: evaluation
+- graph: multi_domain_stretched
+# - model: graphtransformer_ens_multi_domain
+# - training: multi_domain_ensemble_stretched
+# - _self_
+
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+hardware:
+  paths:
+    data: /leonardo_work/DestE_330_25/anemoi/datasets/
+    output: /leonardo_work/DestE_340_26/users/sbuurman/multi-domain-training/output/
+    logs: 
+      base: /leonardo_work/DestE_340_26/users/sbuurman/multi-domain-training/output/logs/
+      mlflow: ${hardware.paths.logs.base}mlflow/
+    graph: /leonardo_work/DestE_340_26/users/sbuurman/graphs/hectometric/res7_10_validation/
+  warm_start: null
+
+dataloader:
+  training:
+    dataset: ${dataloader.dataset}
+    start: null
+    end: 2020
+    frequency: 6h
+    drop:  []
+
+  validation:
+    dataset: ${dataloader.dataset}
+    start: 2021
+    end: 2021
+    frequency: 6h
+    drop:  []
+  hectometric: True
+  hectometric_dataset_training: /leonardo_work/DestE_330_25/anemoi/datasets/DEODE/de330_2025091000_2025091200_1h_AROME_500m_flooding101_v3.zarr
+  hectometric_dataset_validation: /leonardo_work/DestE_330_25/anemoi/datasets/DEODE/de330_2025091000_2025091200_1h_AROME_500m_flooding101_v3.zarr
+  dataset:
+    cutout:
+      - dataset: null
+      - dataset: /leonardo_work/DestE_340_26/ai-ml/datasets/aifs-od-an-oper-0001-mars-n320-2016-2025-6h-v1-combined-land.zarr
+        drop: [cp, q_250, q_50, q_600, sdor, slor, stl1, swvl1, t_250, t_50, t_600, tcw, u_250, u_50, u_600, v_250, v_50, v_600, w_250, w_50, w_600, z_250, z_50, z_600, 100u, 100v]
+        reorder: sort
+    min_distance_km: 20
+    adjust: all
+    reorder: sort
+    statistics:
+      join:
+        - dataset: /leonardo_work/DestE_330_25/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2022-6h-v6.zarr
+          drop: [cp, slor, sdor, tcw, q_50, q_250, q_600, t_50, t_250, t_600, u_50, u_250, u_600, v_50, v_250, v_600, w_50, w_250, w_600, z_50, z_250, z_600]
+          reorder: sort
+        - dataset: /leonardo_work/DestE_330_25/anemoi/datasets/ERA5/aifs-ea-an-oper-0001-mars-n320-1979-2023-6h-v1-land.zarr
+          select: [lcc, mcc, hcc, tcc, strd, ssrd]
+          # select: [lcc, mcc, hcc, tcc]
+      adjust: ["start", "end"]
+      reorder: sort
+
+  
